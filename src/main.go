@@ -3,7 +3,9 @@ package main
 import (
 	// Gin
 
+	"ShoppingApp/models/entity"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -74,13 +76,40 @@ func insertExProduct(registerProduct *Exproduct) {
 	defer db.Close()
 }
 
-// 商品テーブルのレコードを全件取得
-func findAllProduct() []Inproduct {
+// FetchAllProductsIncome 商品テーブルのレコードを全件取得
+func FetchAllProductsIncome(c *gin.Context) {
+	resultProducts := FindAllProductsIncome()
+
+	// URLへのアクセスに対してJSONを返す
+	c.JSON(200, resultProducts)
+}
+
+// FindAllProductsIncome 商品テーブルのレコードを全件取得
+func FindAllProductsIncome() []Inproduct {
 	db := getGormConnect()
 	var products []Inproduct
 
 	// select文
-	db.Order("ID asc").Find(&products)
+	db.Table("inproduct").Order("ID asc").Find(&products)
+	defer db.Close()
+	return products
+}
+
+// FetchAllProductsExpense 商品テーブルのレコードを全件取得
+func FetchAllProductsExpense(c *gin.Context) {
+	resultProducts := FindAllProductsExpense()
+
+	// URLへのアクセスに対してJSONを返す
+	c.JSON(200, resultProducts)
+}
+
+// FindAllProductsExpense 商品テーブルのレコードを全件取得
+func FindAllProductsExpense() []Inproduct {
+	db := getGormConnect()
+	var products []Inproduct
+
+	// select文
+	db.Table("exproduct").Order("ID asc").Find(&products)
 	defer db.Close()
 	return products
 }
@@ -126,15 +155,26 @@ func ExpProduct(c *gin.Context) {
 	insertExProduct(&product)
 }
 
+// DbDeleteProduct は 商品テーブルの指定したレコードを削除する
+func DbDeleteProduct(productID int) {
+	product := []entity.Product{}
+
+	db := getGormConnect()
+	// delete
+	db.Table("inproduct").Delete(&product, productID)
+	defer db.Close()
+}
+
+// inComeDelete は 商品情報をDBから削除する
+func inComeDelete(c *gin.Context) {
+	productIDStr := c.PostForm("ID")
+
+	productID, _ := strconv.Atoi(productIDStr)
+
+	DbDeleteProduct(productID)
+}
+
 func main() {
-	// product テーブルにデータを運ぶための構造体を初期化
-	/*
-		var product = Product{
-			ProductName: "テスト商品",
-			Memo:        "テスト商品です",
-			Status:      "01",
-		}
-	*/
 
 	r := gin.Default()
 
@@ -166,28 +206,15 @@ func main() {
 		MaxAge: 24 * time.Hour,
 	}))
 
-	r.GET("/", func(c *gin.Context) {
-		c.String(200, "Hello, Worldaa")
-	})
-
 	r.POST("/addProduct", AddProduct)
-	/*
-		r.GET("/addProduct", func(c *gin.Context) {
-			// 構造体のポインタを渡す
-			insertProduct(&product)
 
-			// Productテーブルのレコードを全件取得する
-			resultProducts := findAllProduct()
-
-			// Productテーブルのレコードを全件表示する
-			for i := range resultProducts {
-				fmt.Printf("index: %d, 商品ID: %d, 商品名: %s, メモ: %s, ステータス: %s\n",
-					i, resultProducts[i].ID, resultProducts[i].ProductName, resultProducts[i].Memo, resultProducts[i].Status)
-			}
-			//c.String(200, "Hello, World, addProduct")
-		})
-	*/
 	r.POST("/expProduct", ExpProduct)
+
+	r.GET("/getIncome", FetchAllProductsIncome)
+
+	r.GET("/getExpense", FetchAllProductsExpense)
+
+	r.POST("/delete", inComeDelete)
 
 	r.Run()
 }
