@@ -3,7 +3,6 @@ package main
 import (
 	// Gin
 
-	"ShoppingApp/models/entity"
 	"fmt"
 	"strconv"
 	"time"
@@ -16,7 +15,7 @@ import (
 
 // Inproduct DB上のテーブル、カラムと構造体との関連付けが自動的に行われる
 type Inproduct struct {
-	ID          string `gorm:"type:varchar(2);not null"`
+	ID          string `gorm:"type:varchar(11);not null"`
 	ProductName string `gorm:"type:varchar(200);not null"`
 	Amount      string `gorm:"type:varchar(400)"`
 	//Date        time.Time `gorm:"type:datetime(6)"`
@@ -24,7 +23,7 @@ type Inproduct struct {
 
 // Exproduct DB上のテーブル、カラムと構造体との関連付けが自動的に行われる
 type Exproduct struct {
-	ID          string `gorm:"type:varchar(2);not null"`
+	ID          string `gorm:"type:varchar(11);not null"`
 	ProductName string `gorm:"type:varchar(200);not null"`
 	Amount      string `gorm:"type:varchar(400)"`
 	//Date        time.Time `gorm:"type:datetime(6)"`
@@ -33,7 +32,7 @@ type Exproduct struct {
 func getGormConnect() *gorm.DB {
 	DBMS := "mysql"
 	USER := "root"
-	PASS := "root"
+	PASS := "XXXXX"
 	PROTOCOL := "tcp(localhost:3306)"
 	DBNAME := "Shopping"
 	CONNECT := USER + ":" + PASS + "@" + PROTOCOL + "/" + DBNAME
