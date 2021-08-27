@@ -156,12 +156,14 @@ func ExpProduct(c *gin.Context) {
 
 // DbDeleteProduct は 商品テーブルの指定したレコードを削除する
 func DbDeleteProduct(productID int) {
+	/*
 	product := []entity.Product{}
 
 	db := getGormConnect()
 	// delete
 	db.Table("inproduct").Delete(&product, productID)
 	defer db.Close()
+	*/
 }
 
 // inComeDelete は 商品情報をDBから削除する
